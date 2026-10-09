@@ -1,0 +1,239 @@
+{
+  "name": "My workflow 16",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "557156c8-8eb3-4c1d-86c4-56c571f08453",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -592,
+        -256
+      ],
+      "id": "9b5dd57f-fb9a-4844-8b04-0ad4e32689ba",
+      "name": "Webhook",
+      "webhookId": "557156c8-8eb3-4c1d-86c4-56c571f08453"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert AI business email writer with 10+ years of experience in professional corporate communication.\n\nYour task is to take the user's rough message and transform it into a complete, professional, natural, ready-to-send email.\n\nUSER INPUT:\nTo:{{ $json.body.to }} \nSubject:{{ $json.body.subject }} \nMessage: {{ $json.body.body }}\n\nRULES:\n\n1. Create the complete email, not just a rewritten message.\n2. Improve grammar, clarity, structure, professionalism, and natural flow.\n3. Preserve the user's original meaning and intent.\n4. Never invent facts, names, dates, prices, companies, deadlines, promises, or other information.\n5. If important information is missing, use a neutral placeholder such as [Name], [Date], [Company Name], or [Details].\n6. Create a professional subject if the provided subject is empty, unclear, or too short.\n7. Keep the subject specific and under 8 words.\n8. Use the recipient's name or title if provided. Otherwise use a suitable greeting such as \"Dear Sir/Madam\" or \"Hello\".\n9. Write a clear opening sentence explaining the purpose of the email.\n10. Organize the main information into short, readable paragraphs.\n11. Add one clear call to action when appropriate.\n12. End with a suitable professional closing.\n13. If the sender's name is not provided, use [Your Name].\n14. Match the user's language. If the input is English, write natural professional English. If the input is Roman Urdu, write natural Roman Urdu.\n15. Do not add unnecessary information.\n16. Do not explain what you changed.\n17. Return only the final email.\n\nOUTPUT:\nSubject: [final subject]\n\n[complete ready-to-send email]\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        -176
+      ],
+      "id": "7ec7dab3-2f8e-4603-9175-6c6b3895ee03",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hlyQaBn3opLRUoWp",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Request from meeting",
+        "formDescription": "={{ $json.content.parts[0].text }}",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "={{ $('Webhook').item.json.body.subject }}",
+              "fieldType": "radio",
+              "defaultValue": "Approved",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Approved"
+                  },
+                  {
+                    "option": "Reject"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -336
+      ],
+      "id": "ce91ee03-a1dd-4095-8b71-84751d290e1e",
+      "name": "Wait",
+      "webhookId": "8404478d-6299-405a-8455-a634e08c4e4b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3448f7b2-e2ed-4e98-941f-6f1dd5f86754",
+              "leftValue": "={{ $json['Meeting request: [topic]'] }}",
+              "rightValue": "Approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -256
+      ],
+      "id": "75c27275-7f75-4188-ab09-fc0b44fb9595",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "parachasaleem316@gmail.com",
+        "subject": "Meeting Approved",
+        "emailType": "text",
+        "message": "meeting Invitation send",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -304
+      ],
+      "id": "3b51161d-4987-4234-bb31-a9897199cbda",
+      "name": "Send a message",
+      "webhookId": "7278deb3-bd98-4506-8839-998035d5a9f9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dW3nGMUHYm4B8EJV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "parachasaleem316@gmail.com",
+        "subject": "Reject",
+        "emailType": "text",
+        "message": "Reject Meeting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        -96
+      ],
+      "id": "0df4f4ca-8a92-4a5f-9669-5e32388fd38f",
+      "name": "Send a message1",
+      "webhookId": "80b7637d-fcd8-44a4-b091-5ab623d4b853",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dW3nGMUHYm4B8EJV",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b350daf3-3e99-4186-b882-8a711e915ea9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ecead9d9fb8e9ae6fd8401a5e8534dbd4abf8c3d5e3b12c1b360f5da920dc44"
+  },
+  "nodeGroups": [],
+  "id": "iGHd3g1YJ10IVNdv",
+  "tags": []
+}
